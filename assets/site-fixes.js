@@ -1,6 +1,6 @@
 (() => {
-  const companyEmail = "info@nexai.id";
-  const partnerEmail = "partners@nexai.id";
+  const companyEmail = "info@nexia-group.com";
+  const legacyEmails = ["info@nexai.id", "partners@nexai.id", companyEmail];
   const fixedLogoPath = "./images/nexai-logo-official.jpg";
   const pageLinks = {
     privacy: "./privacy.html",
@@ -113,25 +113,34 @@
   }
 
   function updateEmailLinks() {
-    const emailParagraphs = [
-      { value: companyEmail, title: "Email NEXAI" },
-      { value: partnerEmail, title: "Email NEXAI partnerships" },
-    ];
+    document.querySelectorAll("p").forEach((paragraph) => {
+      const text = normalizeText(paragraph.textContent || "");
+      if (!legacyEmails.includes(text) || paragraph.dataset.mailtoPatched === "true") {
+        return;
+      }
 
-    emailParagraphs.forEach(({ value, title }) => {
-      document.querySelectorAll("p").forEach((paragraph) => {
-        if (normalizeText(paragraph.textContent || "") !== value || paragraph.dataset.mailtoPatched === "true") {
-          return;
-        }
+      const link = document.createElement("a");
+      link.href = `mailto:${companyEmail}`;
+      link.textContent = companyEmail;
+      link.className = paragraph.className;
+      link.title = "Email NEXAI";
+      link.dataset.mailtoPatched = "true";
+      paragraph.replaceWith(link);
+    });
 
-        const link = document.createElement("a");
-        link.href = `mailto:${value}`;
-        link.textContent = value;
-        link.className = paragraph.className;
-        link.title = title;
-        link.dataset.mailtoPatched = "true";
-        paragraph.replaceWith(link);
-      });
+    document.querySelectorAll('a[href^="mailto:"]').forEach((link) => {
+      const href = link.getAttribute("href") || "";
+      const label = normalizeText(link.textContent || "");
+      const matchedEmail = legacyEmails.find((email) => href.includes(email));
+
+      if (matchedEmail) {
+        link.href = href.replace(/mailto:[^?]+/i, `mailto:${companyEmail}`);
+      }
+
+      if (legacyEmails.includes(label)) {
+        link.textContent = companyEmail;
+        link.title = "Email NEXAI";
+      }
     });
   }
 
@@ -351,7 +360,7 @@
     if (submitButton && !form.querySelector(".site-fix-form-note")) {
       const note = document.createElement("p");
       note.className = "site-fix-form-note";
-      note.textContent = "Submitting opens your email app with a pre-addressed message to info@nexai.id.";
+      note.textContent = `Submitting opens your email app with a pre-addressed message to ${companyEmail}.`;
       submitButton.insertAdjacentElement("afterend", note);
     }
 
