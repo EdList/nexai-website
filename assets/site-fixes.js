@@ -1,17 +1,15 @@
 (() => {
   const companyEmail = "info@nexai.id";
   const partnerEmail = "partners@nexai.id";
-  const fixedLogoPath = "./images/nexai-logo-official.JPG";
+  const fixedLogoPath = "./images/nexai-logo-official.jpg";
   const pageLinks = {
-    investors: "./investors.html",
     privacy: "./privacy.html",
     terms: "./terms.html",
   };
   const mailtoLinks = {
     requestTour: `mailto:${companyEmail}?subject=${encodeURIComponent("Request a tour of NEXAI")}`,
     requestOverview: `mailto:${companyEmail}?subject=${encodeURIComponent("Request the NEXAI overview pack")}`,
-    investorRelations: `mailto:${companyEmail}?subject=${encodeURIComponent("Investor relations enquiry")}`,
-    approvedMaterials: `mailto:${companyEmail}?subject=${encodeURIComponent("Request approved company materials")}`,
+    generalEnquiry: `mailto:${companyEmail}?subject=${encodeURIComponent("General enquiry for NEXAI")}`,
   };
 
   const altTextFixes = new Map([
@@ -148,13 +146,6 @@
     });
   }
 
-  function findDesktopNavRow(nav) {
-    return Array.from(nav.querySelectorAll("div")).find((element) => {
-      const classes = Array.from(element.classList);
-      return classes.includes("hidden") && classes.includes("lg:flex");
-    }) || null;
-  }
-
   function findMobileMenu() {
     return Array.from(document.querySelectorAll("div")).find((element) => {
       if (element.id === "root" || element.closest("footer") || element.closest("#contact")) {
@@ -170,99 +161,6 @@
     }) || null;
   }
 
-  function ensureInvestorSection() {
-    const contactSection = document.querySelector("#contact");
-    if (!contactSection || document.querySelector("#investors")) {
-      return;
-    }
-
-    const section = document.createElement("section");
-    section.id = "investors";
-    section.className = "site-investors";
-    section.innerHTML = `
-      <div class="site-shell">
-        <div class="site-investors-layout">
-          <div class="site-panel site-investor-summary">
-            <p class="site-kicker">INVESTOR RELATIONS</p>
-            <h2 class="site-heading">Information built for public-market scrutiny.</h2>
-            <p class="site-copy">
-              For shareholders, analysts, governance teams, and strategic investors, NEXAI routes
-              enquiries through controlled channels aligned with approved company materials and
-              formal disclosure practices.
-            </p>
-            <div class="site-button-row">
-              <a class="btn-primary" href="${pageLinks.investors}">Open IR Center</a>
-              <a class="btn-secondary" href="${mailtoLinks.investorRelations}">Email Investor Relations</a>
-            </div>
-          </div>
-          <div class="site-panel site-investor-focus">
-            <div class="site-mini-label">Coverage</div>
-            <h3>What this section is designed to support</h3>
-            <ul class="site-investor-list">
-              <li>Requests for approved company materials and shareholder-facing documents.</li>
-              <li>Governance and oversight questions that need a controlled investor contact path.</li>
-              <li>Management, analyst, and investor meeting requests handled alongside disclosure discipline.</li>
-            </ul>
-            <p class="site-note">
-              <strong>Important:</strong> Website content is provided for general corporate
-              information only and should be read together with formally released company disclosures.
-            </p>
-          </div>
-        </div>
-        <div class="site-investor-grid">
-          <div class="site-panel site-investor-card">
-            <div class="site-mini-label">Materials</div>
-            <h3>Approved company information</h3>
-            <p>
-              Request current company overviews, shareholder communications, and other approved
-              materials through investor relations rather than relying on informal summaries.
-            </p>
-          </div>
-          <div class="site-panel site-investor-card">
-            <div class="site-mini-label">Governance</div>
-            <h3>Governance and oversight context</h3>
-            <p>
-              Route board, policy, and governance enquiries through an appropriate corporate
-              contact rather than relying on informal summaries or marketing copy.
-            </p>
-          </div>
-          <div class="site-panel site-investor-card">
-            <div class="site-mini-label">Disclosures</div>
-            <h3>Public-market discipline</h3>
-            <p>
-              Investor-facing requests are framed around approved releases and controlled
-              communications so stakeholders can evaluate the business on consistent information.
-            </p>
-          </div>
-        </div>
-      </div>
-    `;
-
-    contactSection.insertAdjacentElement("beforebegin", section);
-  }
-
-  function ensureNavLinks() {
-    const nav = document.querySelector("nav");
-    if (!nav) {
-      return;
-    }
-
-    const desktopRow = findDesktopNavRow(nav);
-    if (desktopRow && !desktopRow.querySelector('a[href="#investors"]')) {
-      const investorLink = createLink(
-        "Investors",
-        "#investors",
-        "text-sm text-nexai-text-muted hover:text-nexai-text transition-colors duration-300",
-      );
-      const contactLink = Array.from(desktopRow.querySelectorAll("a")).find(
-        (link) => normalizeText(link.textContent || "") === "Contact",
-      );
-      if (contactLink) {
-        contactLink.insertAdjacentElement("beforebegin", investorLink);
-      }
-    }
-  }
-
   function enhanceContactSection() {
     const contactSection = document.querySelector("#contact");
     if (!contactSection) {
@@ -272,44 +170,7 @@
     const intro = contactSection.querySelector("div > p.text-nexai-text-muted.leading-relaxed");
     if (intro) {
       intro.textContent =
-        "Whether you're a hyperscaler looking for capacity, an investor reviewing the opportunity, or a partner ready to join the ecosystem, we'll route your enquiry to the right team.";
-    }
-
-    const leftColumn = Array.from(contactSection.querySelectorAll("div")).find((element) => {
-      return element.classList.contains("space-y-8");
-    });
-
-    if (leftColumn && !leftColumn.querySelector('[data-site-investor-contact="true"]')) {
-      const ctaRow = Array.from(leftColumn.children).find((element) => {
-        return element.classList.contains("flex") && element.querySelector("a");
-      });
-
-      const card = document.createElement("div");
-      card.className = "glass-card p-6 site-contact-card";
-      card.dataset.siteInvestorContact = "true";
-      card.innerHTML = `
-        <div class="flex items-center gap-4">
-          <div class="w-10 h-10 rounded-xl bg-nexai-accent/10 flex items-center justify-center">
-            <span class="site-symbol">IR</span>
-          </div>
-          <div>
-            <h4 class="font-display font-semibold text-nexai-text">Investor Relations</h4>
-            <a class="text-nexai-text-muted text-sm" href="${mailtoLinks.investorRelations}">
-              ${companyEmail}
-            </a>
-          </div>
-        </div>
-        <p class="text-nexai-text-muted text-sm leading-relaxed">
-          Use this path for shareholder, governance, or approved-material requests that need
-          disciplined handling.
-        </p>
-      `;
-
-      if (ctaRow) {
-        ctaRow.insertAdjacentElement("beforebegin", card);
-      } else {
-        leftColumn.append(card);
-      }
+        "Whether you're evaluating capacity, exploring a partnership, or reaching out about the company, we'll route your enquiry to the right team.";
     }
 
     Array.from(contactSection.querySelectorAll("a")).forEach((link) => {
@@ -338,12 +199,12 @@
               </div>
             </a>
             <p style="margin-top:1rem;">
-              NEXAI presents general corporate information for customers, partners, and capital
-              markets audiences evaluating the business through approved disclosure channels.
+              NEXAI shares corporate information for customers, partners, and stakeholders
+              evaluating the company's AI infrastructure platform.
             </p>
             <div class="site-footer-links">
-              <a href="${pageLinks.investors}">Investor Relations Center</a>
-              <a href="${mailtoLinks.approvedMaterials}">Request approved company materials</a>
+              <a href="${mailtoLinks.requestOverview}">Request Overview</a>
+              <a href="${mailtoLinks.generalEnquiry}">General enquiries</a>
             </div>
           </div>
           <div class="site-footer-column">
@@ -353,17 +214,15 @@
               <a href="#approach">Approach</a>
               <a href="#vision">Vision</a>
               <a href="#leadership">Leadership</a>
-              <a href="#investors">Investors</a>
               <a href="#contact">Contact</a>
             </div>
           </div>
           <div class="site-footer-column">
-            <p class="site-footer-heading">Investors</p>
+            <p class="site-footer-heading">Connect</p>
             <div class="site-footer-links">
-              <a href="${pageLinks.investors}">IR Center</a>
-              <a href="${mailtoLinks.investorRelations}">Investor enquiries</a>
-              <a href="${mailtoLinks.approvedMaterials}">Approved materials</a>
-              <a href="#investors">IR on homepage</a>
+              <a href="${mailtoLinks.requestTour}">Request a tour</a>
+              <a href="${mailtoLinks.requestOverview}">Request overview</a>
+              <a href="${mailtoLinks.generalEnquiry}">Email NEXAI</a>
             </div>
           </div>
           <div class="site-footer-column">
@@ -378,8 +237,8 @@
         <div class="site-footer-meta">
           <p>&copy; ${new Date().getFullYear()} NEXAI. All rights reserved.</p>
           <p>
-            This website provides general corporate information only and does not constitute an
-            offer to sell or a solicitation to buy securities.
+            This website provides general corporate information only and should be paired with
+            direct company contact for current materials or formal business discussions.
           </p>
         </div>
       </div>
@@ -407,18 +266,6 @@
       );
       const navLinks = existingLinks.filter((link) => link !== getInTouchLink);
 
-      if (!navLinks.some((link) => link.getAttribute("href") === "#investors")) {
-        const contactIndex = navLinks.findIndex(
-          (link) => normalizeText(link.textContent || "") === "Contact",
-        );
-        const investorLink = createLink("Investors", "#investors", "");
-        if (contactIndex >= 0) {
-          navLinks.splice(contactIndex, 0, investorLink);
-        } else {
-          navLinks.push(investorLink);
-        }
-      }
-
       panel.innerHTML = "";
       panel.className = "site-mobile-menu-panel";
       panel.dataset.siteEnhanced = "true";
@@ -429,7 +276,7 @@
         <p class="site-kicker">Navigate</p>
         <h2 class="site-mobile-menu-title">Explore NEXAI</h2>
         <p class="site-mobile-menu-copy">
-          Public-company information, infrastructure context, and controlled investor routes in one place.
+          Corporate overview, infrastructure strategy, and the fastest routes into the team.
         </p>
       `;
 
@@ -447,7 +294,7 @@
         ctaGroup.append(getInTouchLink);
       }
       ctaGroup.append(
-        createLink("Investor Relations Center", pageLinks.investors, "btn-secondary"),
+        createLink("Request Overview", mailtoLinks.requestOverview, "btn-secondary"),
       );
 
       const footer = document.createElement("div");
@@ -456,11 +303,11 @@
         <div class="site-mobile-menu-meta-links">
           <a href="${pageLinks.privacy}">Privacy</a>
           <a href="${pageLinks.terms}">Terms</a>
-          <a href="${mailtoLinks.investorRelations}">IR Enquiry</a>
+          <a href="${mailtoLinks.generalEnquiry}">Email</a>
         </div>
         <p class="site-mobile-menu-note">
-          General corporate information only. Use approved company materials and formal disclosures
-          for investor evaluation.
+          Use this site for company background, then reach the team directly for current materials
+          or next steps.
         </p>
       `;
 
@@ -542,12 +389,10 @@
 
   function applyFixes() {
     updateOverviewLabels();
-    ensureInvestorSection();
     updateLogoSources();
     updatePlaceholderLinks();
     updateEmailLinks();
     updateAltText();
-    ensureNavLinks();
     enhanceContactSection();
     enhanceFooter();
     enhanceMobileMenu();
